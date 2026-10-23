@@ -1,24 +1,15 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+# Security policy
 
-- [Security Policy](#security-policy)
-  - [Supported Versions](#supported-versions)
-  - [Reporting a Vulnerability](#reporting-a-vulnerability)
+FlowTrail is an experimental fork of Skyvern. There is no separate stable-release security support matrix at present.
 
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+## Reporting a vulnerability
 
-# Security Policy
+For FlowTrail-specific vulnerabilities, use the repository's Security tab and **Report a vulnerability** if private reporting is enabled: [FlowTrail security](https://github.com/unumbrela/flowtrail/security).
 
-## Supported Versions
+If that option is unavailable, open an issue asking for a private reporting channel without including exploit details, credentials, or personal data. If Issues are also unavailable, do not publish sensitive details in a PR; wait for a private maintainer contact channel.
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+For vulnerabilities reproducible in unmodified Skyvern, follow the [upstream security policy](https://github.com/Skyvern-AI/skyvern/security/policy).
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 0.1.x   | :white_check_mark: |
-| < 0.1.0   | :x:                |
+## Data handling
 
-## Reporting a Vulnerability
-
-Navigate to the [GitHub Advisories page](https://github.com/Skyvern-AI/skyvern/security/advisories) for the repository and click 'Report a Vulnerability'.
+Profile information and questionnaire answers are sent to the configured model and saved in task records. Local artifacts may contain screenshots and submitted values. Use fictional data in demonstrations and remove sensitive content before sharing logs or recordings.

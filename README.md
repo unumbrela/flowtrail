@@ -1,24 +1,41 @@
+<div align="center">
+
 # FlowTrail · 流迹
 
-**可追溯的 AI 浏览器自动化工作台 — Traceable AI browser automation.**
+### 让 AI 填写问卷，让每一步都有迹可循。
 
-FlowTrail 围绕中文问卷填写提供资料输入、答案映射、浏览器执行、进度查看与人工接管入口。项目重点展示场景设计、React / TypeScript 工程实践、模型接入与端到端验证。
+可追溯的 AI 浏览器自动化工作台，基于 Skyvern。
 
-![FlowTrail 问卷星填写界面](docs/portfolio/screenshots/wenjuanxing.png)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
+[![Built with Skyvern](https://img.shields.io/badge/Built_with-Skyvern-6C63FF)](UPSTREAM.md)
+[![Status: Experimental](https://img.shields.io/badge/Status-Experimental-orange)](docs/flowtrail/roadmap.md)
 
-## 核心能力
+**简体中文** · [English](README.en.md)
 
-- **问卷星场景入口**：校验问卷链接、填写资料和逐题答案映射，再创建浏览器会话与执行任务。
-- **可检查的执行过程**：提供运行记录、操作截图和浏览器查看能力，便于核对及手动处理。
-- **明确的任务策略**：默认只填写，显式选择后才要求提交；缺失必填信息、登录或验证码要求停止并提示。
-- **本地模型集成**：提供百炼 OpenAI-compatible 配置示例、固定镜像版本和模型注册脚本。
-- **可重复演示**：提供两页中文问卷夹具与 fill / submit / missing 三种集成测试场景。
+[快速开始](docs/flowtrail/quickstart.md) · [使用说明](docs/wenjuanxing.md) · [项目结构](docs/flowtrail/structure.md) · [参与贡献](CONTRIBUTING.md)
 
-提交策略属于模型指令约束，并非浏览器层动作拦截。尚未验证全部真实问卷星题型；当前验证覆盖本地演示页面，不能当作通用成功率指标。
+</div>
 
-## 快速运行
+![FlowTrail 中文问卷工作台：填写资料、答案映射与任务入口](docs/portfolio/screenshots/wenjuanxing.png)
 
-需要 Docker Compose 2.24.4+、Node.js 22+ 和 Python 3.11+，以及支持视觉输入的百炼模型密钥。以下命令在全新克隆目录执行；已有配置请保留。
+## 从填写资料，到可核对的执行过程
+
+把资料和逐题答案交给 FlowTrail，创建浏览器任务，在运行记录中查看操作与截图，需要时打开浏览器手动处理。当前聚焦中文问卷填写，适合本地演示、场景开发和浏览器 Agent 集成实验。
+
+| 能力 | 你可以做什么 |
+| --- | --- |
+| 中文问卷入口 | 校验问卷星链接，输入资料，指定“题目或关键词 → 答案” |
+| 可追溯执行 | 查看任务状态、运行记录、操作截图与浏览器会话 |
+| 人工接管入口 | 打开浏览器核对或补充；指令要求遇到登录、验证码时停止 |
+| 明确填写意图 | 默认要求只填写，显式选择后才要求提交 |
+| 本地模型接入 | 使用百炼 OpenAI-compatible 配置和模型注册脚本 |
+| 可重复验证 | 用两页中文问卷夹具验证填写、提交和缺失信息三条路径 |
+
+> **实验阶段**：提交策略由模型指令约束，尚无浏览器层的强制提交拦截。当前验证覆盖本地夹具，不能代表所有真实问卷星题型或通用成功率。
+
+## 开始使用
+
+需要 Docker Compose **2.24.4+**、Node.js **22+**、Python **3.11+**，以及支持视觉输入的百炼模型密钥。
 
 ```bash
 git clone https://github.com/unumbrela/flowtrail.git
@@ -28,52 +45,47 @@ cp .env.bailian.example .env.bailian
 cp skyvern-frontend/.env.example skyvern-frontend/.env
 ```
 
-在 `.env.bailian` 中填写自己的 `OPENAI_COMPATIBLE_API_KEY`。删除 `skyvern-frontend/.env` 中的 `VITE_SKYVERN_API_KEY=YOUR_API_KEY` 占位行，UI 服务会读取后端首次启动生成的本地凭据。不要提交这些配置文件。
+在 `.env.bailian` 填入模型密钥，并删除 `skyvern-frontend/.env` 中的 `VITE_SKYVERN_API_KEY=YOUR_API_KEY` 占位行。以下命令在仓库根目录执行：
 
 ```bash
-cd skyvern-frontend
-npm ci
-npm run build
-cd ..
+npm --prefix skyvern-frontend ci
+npm --prefix skyvern-frontend run build
 docker compose up -d
-# 等待 docker compose ps 显示后端 healthy 后执行：
+# 等待 docker compose ps 中后端显示 healthy，再注册模型：
 python3 scripts/setup_bailian.py
 ```
 
-打开 [FlowTrail 问卷页面](http://localhost:8080/wenjuanxing)。本地演示问卷可在 [8765 端口](http://localhost:8765/wjx.html) 查看；集成脚本通过容器网络访问它，不需要真实外部问卷。
+打开 **[本地问卷工作台](http://localhost:8080/wenjuanxing)**。完整配置、镜像说明和排错见[本地启动指南](docs/flowtrail/quickstart.md)。模型执行会产生模型用量。
 
-`docker-compose.override.yml` 固定已验证的后端镜像并挂载本项目构建产物。Python 包、API、服务名保留 `skyvern` 以保持兼容；本地修改后端源码不会自动进入该镜像。修改前端后重新构建并运行 `docker compose restart skyvern-ui`。
+## 工作原理
 
-## 验证
-
-```bash
-cd skyvern-frontend
-npm test -- src/routes/wenjuanxing src/api/AxiosClient.test.ts src/routes/root src/components/SidebarTreeNav.test.tsx src/hooks/localDiagnostics.test.ts
-npm run build
-# 以下测试会调用实际模型并产生模型用量，请串行执行：
-node scripts/wenjuanxing-smoke.mjs fill
-node scripts/wenjuanxing-smoke.mjs submit
-node scripts/wenjuanxing-smoke.mjs missing
+```mermaid
+flowchart LR
+    A[资料与答案映射] --> B[前端校验与任务生成]
+    B --> C[Skyvern 浏览器会话与任务 API]
+    C --> D[视觉模型与浏览器执行]
+    D --> E[状态、运行记录与截图]
+    E --> F[人工核对与接管]
 ```
 
-当前定向测试共 **88 项通过**，TypeScript 检查与生产构建通过。
+FlowTrail 的场景入口、任务策略和本地验证建立在 Skyvern 执行引擎之上。Python 包名、API 和容器服务名保留 `skyvern`；详细来源与兼容边界见 [UPSTREAM.md](UPSTREAM.md)。默认部署使用固定后端镜像，本地后端源码修改需要另行构建镜像。
 
-本地浏览器实测：只填写场景停在提交前；提交场景服务端恰好新增一份回执；缺少邮箱场景返回 `MISSING_INFORMATION`。详细测试范围、运行记录及边界见 [问卷功能文档](docs/wenjuanxing.md)。这些结果来自本地测试，不代表外部网站全部兼容。
+## 找到你需要的内容
 
-## 工程导航
-
-| 位置 | 职责 |
+| 我想… | 从这里开始 |
 | --- | --- |
-| `skyvern-frontend/src/routes/wenjuanxing/` | 场景页面、输入校验、任务生成和测试 |
-| `skyvern-frontend/src/api/AxiosClient.ts` | 请求及鉴权错误分类 |
-| `skyvern-frontend/src/hooks/localDiagnostics.ts` | 本地可选诊断响应识别 |
-| `local-demo/` | 可控演示页面与服务端回执 |
-| `skyvern-frontend/scripts/wenjuanxing-smoke.mjs` | 真实模型集成验证 |
-| `scripts/setup_bailian.py` | 本地百炼模型注册 |
-| `skyvern/` | Python Agent 与后端 |
+| 启动并试用 | [快速开始](docs/flowtrail/quickstart.md) |
+| 理解填写和提交行为 | [问卷使用说明与边界](docs/wenjuanxing.md) |
+| 找代码、理解目录 | [项目结构与修改入口](docs/flowtrail/structure.md) |
+| 复现测试 | [验证指南](docs/flowtrail/testing.md) |
+| 理解设计取舍 | [贡献与设计说明](docs/portfolio/contributions.md) |
+| 参与后续开发 | [路线图](docs/flowtrail/roadmap.md) · [贡献指南](CONTRIBUTING.md) |
+| 查看上游资料 | [Skyvern 原始 README](README.upstream.md) |
 
-## 许可
+## 一起完善 FlowTrail
 
-遵循 [GNU AGPL v3](LICENSE)。
+欢迎改进题型覆盖、失败诊断、文档和可复现测试。提交问题时请附上脱敏后的复现步骤；新增题型最好附上本地夹具。具体流程见[贡献指南](CONTRIBUTING.md)。如果项目对你有帮助，欢迎 Star 或分享实际使用反馈。
 
-感谢 [Skyvern](https://github.com/Skyvern-AI/skyvern) 开源项目，本项目在开发过程中参考并复用了其诸多设计与实现。
+## 许可与致谢
+
+基于 [Skyvern](https://github.com/Skyvern-AI/skyvern) 的 fork，遵循 [GNU AGPL v3](LICENSE)。保留上游版权与许可声明；FlowTrail 改动范围见[设计说明](docs/portfolio/contributions.md)。

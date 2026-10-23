@@ -1,15 +1,11 @@
-## Description
+## 问题与改动 / What changed
 
-<!--- Describe your changes in detail -->  
+<!-- 描述具体场景、原行为和新行为。关联 Issue（如有）。 -->
 
-## How Has This Been Tested?
+## 验证 / Validation
 
-<!--- Please describe in detail how you tested your changes. -->  
+<!-- 列出实际运行的命令与结果；说明未运行的检查及原因。界面改动附脱敏截图。 -->
 
-<!--- Include details of your testing environment, and the tests you ran to -->  
+## 影响与限制 / Impact
 
-<!--- see how your change affects other areas of the code, etc. -->  
-
-## Artifacts (if appropriate):
-
-<!--- Include videos and pictures that validate your work -->  
+<!-- 是否影响 API、部署配置、上游兼容、数据处理或提交行为？ -->
