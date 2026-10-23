@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import { isLocalDiagnosticsUnavailable } from "./localDiagnostics";
 
 import { getClient } from "@/api/AxiosClient";
 
@@ -31,7 +31,7 @@ async function fetchDiagnostics(): Promise<LLMDiagnosticsResponse> {
     );
     return response.data;
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 404) {
+    if (isLocalDiagnosticsUnavailable(error)) {
       return {
         status: "ok",
         default_llm_key: "",
