@@ -33,7 +33,7 @@ function App() {
         >
           <QueryClientProvider client={queryClient}>
             <RuntimeFeatureFlagProvider>
-              <ThemeProvider defaultTheme="dark">
+              <ThemeProvider defaultTheme="light">
                 <RouterProvider router={router} />
               </ThemeProvider>
             </RuntimeFeatureFlagProvider>

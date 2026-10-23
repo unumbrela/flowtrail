@@ -11,6 +11,7 @@ import { BrowserSession } from "@/routes/browserSessions/BrowserSession";
 import { BrowserSessions } from "@/routes/browserSessions/BrowserSessions";
 import { PageLayout } from "./components/PageLayout";
 import { DiscoverPage } from "./routes/discover/DiscoverPage";
+import { WenjuanxingPage } from "./routes/wenjuanxing/WenjuanxingPage";
 import { HistoryPage } from "./routes/history/HistoryPage";
 import { RootLayout } from "./routes/root/RootLayout";
 import { Settings } from "./routes/settings/Settings";
@@ -127,6 +128,11 @@ const router = createBrowserRouter([
       </DebugStoreProvider>
     ),
     children: [
+      {
+        path: "wenjuanxing",
+        element: <PageLayout />,
+        children: [{ index: true, element: <WenjuanxingPage /> }],
+      },
       {
         path: "runs",
         element: <PageLayout />,
