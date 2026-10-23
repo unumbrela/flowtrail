@@ -8,7 +8,7 @@
 4. 点击“开始填写”。默认只填写；需要自动提交时勾选“填写后自动提交”。
 5. 页面显示任务进度，点击“打开浏览器”查看或手动补充，点击“查看运行详情”查看操作与截图。
 
-填写资料不会额外写入浏览器 localStorage，但会作为任务内容发送至当前模型并保存到 Skyvern 运行记录。浏览器会话最多保留 60 分钟。刷新此页面不会恢复表单或进度卡片，已启动任务可从 Runs 和 Browsers 中找回。
+填写资料不会额外写入浏览器 localStorage，但会作为任务内容发送至当前模型并保存到运行记录。浏览器会话最多保留 60 分钟。刷新此页面不会恢复表单或进度卡片，已启动任务可从 Runs 和 Browsers 中找回。
 
 缺少必填信息、答案冲突时要求 Agent 停止并报告具体问题；遇到登录或验证码也要求停止，用户可在保留的浏览器中处理。自动提交只要求提交一份，需确认成功页面；网络异常不会自动重试任务创建。创建结果不确定时，请先检查运行记录。
 
@@ -20,9 +20,8 @@
 | --- | --- | --- |
 | [zerro-223/wjx-autofill](https://github.com/zerro-223/wjx-autofill) | [wjx_fill.py](https://github.com/zerro-223/wjx-autofill/blob/main/wjx_fill.py)：定位题干、关键词匹配、进入问卷、填写文本；[MIT 许可](https://github.com/zerro-223/wjx-autofill/blob/main/LICENSE) | 参考按题干匹配及入口按钮处理思路。原实现主要支持文本输入，未直接移植其独立浏览器和定时逻辑。 |
 | [Ggbikun/wjx](https://github.com/Ggbikun/wjx) | README 与 Python 目录提供多题型、比例配置、翻页等方案 | 作为功能调研参考；未复制代码，也未引入批量随机作答逻辑。 |
-| [Skyvern](https://github.com/Skyvern-AI/skyvern) | 本仓库 `TaskRunRequest`、Runs API、浏览器会话 API 和已有本地填表流程 | 直接复用现有 Agent、组织默认模型、运行历史、截图与浏览器查看能力。 |
 
-本实现为独立编写，没有复制第三方源代码或新增自动化依赖。对当前项目，复用 Skyvern 比嵌入另一套 Selenium / Playwright 进程更适合：当前 Docker 后端已有执行能力，前端即可提供结构化任务入口。
+本实现为独立编写，没有复制第三方源代码或新增自动化依赖。对当前项目，使用现有执行引擎比嵌入另一套 Selenium / Playwright 进程更适合：当前 Docker 后端已有执行能力，前端即可提供结构化任务入口。
 
 ## 实现位置
 

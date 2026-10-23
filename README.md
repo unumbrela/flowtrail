@@ -2,16 +2,14 @@
 
 **可追溯的 AI 浏览器自动化工作台 — Traceable AI browser automation.**
 
-FlowTrail 基于 [Skyvern](https://github.com/Skyvern-AI/skyvern) 二次开发，围绕中文问卷填写提供资料输入、答案映射、浏览器执行、进度查看与人工接管入口。项目重点展示场景设计、React / TypeScript 工程实践、模型接入与端到端验证。
-
-> 来源说明：浏览器 Agent、Python 后端、工作流执行引擎和大部分基础应用来自 Skyvern。本项目新增与修改的范围见 [贡献说明](docs/portfolio/contributions.md)，保留上游历史及 AGPL-3.0 许可证。
+FlowTrail 围绕中文问卷填写提供资料输入、答案映射、浏览器执行、进度查看与人工接管入口。项目重点展示场景设计、React / TypeScript 工程实践、模型接入与端到端验证。
 
 ![FlowTrail 问卷星填写界面](docs/portfolio/screenshots/wenjuanxing.png)
 
 ## 核心能力
 
 - **问卷星场景入口**：校验问卷链接、填写资料和逐题答案映射，再创建浏览器会话与执行任务。
-- **可检查的执行过程**：复用上游运行记录、操作截图和浏览器查看能力，便于核对及手动处理。
+- **可检查的执行过程**：提供运行记录、操作截图和浏览器查看能力，便于核对及手动处理。
 - **明确的任务策略**：默认只填写，显式选择后才要求提交；缺失必填信息、登录或验证码要求停止并提示。
 - **本地模型集成**：提供百炼 OpenAI-compatible 配置示例、固定镜像版本和模型注册脚本。
 - **可重复演示**：提供两页中文问卷夹具与 fill / submit / missing 三种集成测试场景。
@@ -44,7 +42,7 @@ python3 scripts/setup_bailian.py
 
 打开 [FlowTrail 问卷页面](http://localhost:8080/wenjuanxing)。本地演示问卷可在 [8765 端口](http://localhost:8765/wjx.html) 查看；集成脚本通过容器网络访问它，不需要真实外部问卷。
 
-`docker-compose.override.yml` 固定已验证的上游镜像并挂载本项目构建产物。Python 包、API、服务名保留 `skyvern` 以兼容上游；本地修改后端源码不会自动进入该镜像。修改前端后重新构建并运行 `docker compose restart skyvern-ui`。
+`docker-compose.override.yml` 固定已验证的后端镜像并挂载本项目构建产物。Python 包、API、服务名保留 `skyvern` 以保持兼容；本地修改后端源码不会自动进入该镜像。修改前端后重新构建并运行 `docker compose restart skyvern-ui`。
 
 ## 验证
 
@@ -72,8 +70,10 @@ node scripts/wenjuanxing-smoke.mjs missing
 | `local-demo/` | 可控演示页面与服务端回执 |
 | `skyvern-frontend/scripts/wenjuanxing-smoke.mjs` | 真实模型集成验证 |
 | `scripts/setup_bailian.py` | 本地百炼模型注册 |
-| `skyvern/` | 上游 Python Agent 与后端 |
+| `skyvern/` | Python Agent 与后端 |
 
-## 来源与许可
+## 许可
 
-遵循 [GNU AGPL v3](LICENSE)。[UPSTREAM.md](UPSTREAM.md) 记录来源和兼容命名约定；原始项目介绍保留于 [README.upstream.md](README.upstream.md)。问卷自动填写相关开源项目的调研及参考范围见 [调研记录](docs/wenjuanxing.md#调研与实现选择)。
+遵循 [GNU AGPL v3](LICENSE)。
+
+感谢 [Skyvern](https://github.com/Skyvern-AI/skyvern) 开源项目，本项目在开发过程中参考并复用了其诸多设计与实现。

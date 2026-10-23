@@ -1,8 +1,4 @@
-import {
-  ExternalLinkIcon,
-  GitHubLogoIcon,
-  ReaderIcon,
-} from "@radix-ui/react-icons";
+import { GitHubLogoIcon, ReaderIcon } from "@radix-ui/react-icons";
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 
@@ -24,12 +20,6 @@ const links = [
     label: "FlowTrail GitHub",
     href: "https://github.com/unumbrela/flowtrail",
     icon: <GitHubLogoIcon className="size-4" />,
-    cta: false,
-  },
-  {
-    label: "Powered by Skyvern",
-    href: "https://github.com/Skyvern-AI/skyvern",
-    icon: <ExternalLinkIcon className="size-4" />,
     cta: false,
   },
 ];
