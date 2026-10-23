@@ -3,7 +3,6 @@ import { isPaymentRequiredError } from "@/api/paymentRequired";
 import { Createv2TaskRequest } from "@/api/types";
 import { stringify as convertToYAML } from "yaml";
 import { WorkflowCreateYAMLRequest } from "@/routes/workflows/types/workflowYamlTypes";
-import img from "@/assets/promptBoxBg.png";
 import { CartIcon } from "@/components/icons/CartIcon";
 import { GraphIcon } from "@/components/icons/GraphIcon";
 import { InboxIcon } from "@/components/icons/InboxIcon";
@@ -839,26 +838,16 @@ function PromptBoxImpl(
 
   if (!minimal) {
     return (
-      <div className="relative isolate flex flex-col items-center pb-4 pt-12 md:pt-24">
-        {/* The artwork is translucent white: it reads as shading on the dark background and is inverted for light. */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[30rem] opacity-85 invert [mask-image:radial-gradient(closest-side,#000_35%,transparent_100%)] dark:opacity-100 dark:invert-0 md:h-[35rem]"
-          style={{
-            background: `url(${img}) 50% / cover no-repeat`,
-          }}
-        />
+      <div className="relative flex flex-col items-center pb-4 pt-8 md:pt-16">
         <div className="flex w-full max-w-[45rem] flex-col items-start text-left md:items-center md:text-center">
-          <span className="text-2xl font-semibold tracking-tight md:text-[1.875rem] md:leading-[2.375rem]">
-            What task would you like to accomplish?
-          </span>
+          <h2 className="welcome-title">What would you like to get done?</h2>
           <p className="mt-2.5 text-[15px] leading-[22px] text-muted-foreground">
-            Describe it like you would to a colleague. Skyvern opens a browser
-            and does it.
+            Add a website and describe the steps. FlowTrail will run them in a
+            browser.
           </p>
         </div>
         <div className="mt-6 flex w-full max-w-[45rem] flex-col md:mt-9">
-          <div className="flex w-full flex-col rounded-2xl border border-input bg-background text-muted-foreground shadow-[0_12px_32px_rgba(0,0,0,0.06)] transition-[border-color,box-shadow] focus-within:border-foreground/20 focus-within:shadow-[0_0_0_4px_rgba(79,70,229,0.10),0_12px_32px_rgba(0,0,0,0.06)] dark:bg-slate-elevation1 dark:shadow-[0_12px_32px_rgba(0,0,0,0.35)] dark:focus-within:shadow-[0_0_0_4px_rgba(165,180,252,0.14),0_12px_32px_rgba(0,0,0,0.35)]">
+          <div className="prompt-composer flex w-full flex-col">
             <CyclingPlaceholderTextarea
               ref={textareaRef}
               id="discover-prompt-input"
@@ -986,11 +975,11 @@ function PromptBoxImpl(
           "mb-7": !minimal,
         })}
       >
-        <span className="text-2xl">What task would you like to do?</span>
+        <h2 className="welcome-title">What would you like to get done?</h2>
         {minimal ? (
           <p className="mt-2 max-w-[47rem] text-[13.5px] text-muted-foreground">
-            Describe it like you would to a colleague. Skyvern opens a browser
-            and does it.
+            Add a website and describe the steps. FlowTrail will run them in a
+            browser.
             <button
               type="button"
               aria-expanded={showHowItWorks}
@@ -1014,7 +1003,7 @@ function PromptBoxImpl(
         ) : null}
       </div>
       <div className="flex w-full flex-col">
-        <div className="flex w-full flex-col rounded-xl border border-input bg-background p-2 text-muted-foreground shadow-sm transition-colors focus-within:border-foreground/20 focus-within:ring-2 focus-within:ring-ring/10">
+        <div className="prompt-composer flex w-full flex-col p-2">
           <CyclingPlaceholderTextarea
             ref={textareaRef}
             id="discover-prompt-input"
@@ -1099,7 +1088,7 @@ function PromptBoxImpl(
                     />
                   ) : null}
                   <div className="min-w-0">
-                    <div className="mb-1.5 text-indigo-300">{step.icon}</div>
+                    <div className="mb-1.5 text-brand">{step.icon}</div>
                     <h3 className="mb-1 text-[13px] font-semibold">
                       {step.title}
                     </h3>
