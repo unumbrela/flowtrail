@@ -1,18 +1,11 @@
 import {
-  DiscordLogoIcon,
   ExternalLinkIcon,
   GitHubLogoIcon,
   ReaderIcon,
-  StarIcon,
 } from "@radix-ui/react-icons";
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 
-import {
-  starCountFormatter,
-  useGithubStarCount,
-} from "@/hooks/useGithubStarCount";
-import { DISCORD_INVITE_URL, GITHUB_REPO_URL } from "@/util/externalLinks";
 import { cn } from "@/util/utils";
 
 type Props = {
@@ -22,32 +15,26 @@ type Props = {
 
 const links = [
   {
-    label: "API Docs",
-    href: "https://www.skyvern.com/docs",
+    label: "项目文档",
+    href: "https://github.com/unumbrela/flowtrail#readme",
     icon: <ReaderIcon className="size-4" />,
+    cta: false,
   },
   {
-    label: "GitHub",
-    href: GITHUB_REPO_URL,
+    label: "FlowTrail GitHub",
+    href: "https://github.com/unumbrela/flowtrail",
     icon: <GitHubLogoIcon className="size-4" />,
-    showStars: true,
+    cta: false,
   },
   {
-    label: "Discord",
-    href: DISCORD_INVITE_URL,
-    icon: <DiscordLogoIcon className="size-4" />,
-  },
-  {
-    label: "Book a demo",
-    href: "https://www.skyvern.com/contact",
+    label: "Powered by Skyvern",
+    href: "https://github.com/Skyvern-AI/skyvern",
     icon: <ExternalLinkIcon className="size-4" />,
-    cta: true,
+    cta: false,
   },
 ];
 
 function SidebarResourceLinks({ collapsed, billingLink }: Props) {
-  const { data: starCount } = useGithubStarCount();
-
   return (
     <div
       className={cn(
@@ -117,12 +104,6 @@ function SidebarResourceLinks({ collapsed, billingLink }: Props) {
             {!collapsed && (
               <>
                 <span className="min-w-0 flex-1 truncate">{link.label}</span>
-                {link.showStars && typeof starCount === "number" ? (
-                  <span className="flex shrink-0 items-center gap-1 text-[11px] text-neutral-400 group-hover:text-neutral-700 dark:text-neutral-500 dark:group-hover:text-neutral-400">
-                    <StarIcon className="size-3" />
-                    {starCountFormatter.format(starCount)}
-                  </span>
-                ) : null}
               </>
             )}
           </a>

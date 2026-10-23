@@ -1,6 +1,5 @@
 function LogoMinimized() {
-  const src = "/logo-small.png";
-  return <img src={src} alt="Minimized Logo" />;
+  return <img src="/flowtrail.svg" alt="FlowTrail" className="size-8" />;
 }
 
 export { LogoMinimized };
