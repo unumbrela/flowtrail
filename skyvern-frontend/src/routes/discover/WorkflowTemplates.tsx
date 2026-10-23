@@ -88,7 +88,7 @@ function WorkflowTemplates({ folderId }: { folderId?: string | null } = {}) {
             Start from a template
           </h2>
           <p className="text-[13px] text-muted-foreground">
-            Ready-made agents you can run as they are or edit.
+            Choose a workflow and adapt it to your task.
           </p>
         </div>
         {canExpand ? (

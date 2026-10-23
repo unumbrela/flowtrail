@@ -159,7 +159,7 @@ function DiscoverPage({ revamp = false, onRevampComplete }: Props = {}) {
                 className="mr-2 h-3 w-3 motion-safe:animate-spin motion-reduce:animate-none"
               />
             )}
-            Skip — start from a blank agent
+            Start from scratch
           </Button>
         </div>
       </div>
@@ -194,7 +194,7 @@ function DiscoverPage({ revamp = false, onRevampComplete }: Props = {}) {
             ) : (
               <FilePlusIcon aria-hidden="true" className="size-4" />
             )}
-            Start with a blank canvas
+            Start from scratch
           </Button>
         }
       />

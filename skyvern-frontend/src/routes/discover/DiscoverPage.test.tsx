@@ -431,7 +431,7 @@ describe("DiscoverPage onboarding mount", () => {
     const content =
       screen.getByTestId("discover-templates").parentElement?.parentElement;
     expect(content?.textContent).toBe(
-      "Create an agentpromptStart with a blank canvastemplates",
+      "Create an agentpromptStart from scratchtemplates",
     );
     expect(screen.queryByText("Build your first agent")).toBeNull();
     expect(screen.queryByText(/Keep going/)).toBeNull();
@@ -446,7 +446,7 @@ describe("DiscoverPage onboarding mount", () => {
     );
 
     fireEvent.click(
-      screen.getByRole("button", { name: /start with a blank canvas/i }),
+      screen.getByRole("button", { name: /start from scratch/i }),
     );
 
     const submitted = mocks.capture.mock.calls.find(
@@ -488,7 +488,7 @@ describe("DiscoverPage redesigned blank agent", () => {
     );
 
     const action = screen.getByRole("button", {
-      name: "Skip — start from a blank agent",
+      name: "Start from scratch",
     });
     fireEvent.click(action);
     expect(
@@ -527,7 +527,7 @@ describe("DiscoverPage redesigned blank agent", () => {
     );
 
     const action = screen.getByRole("button", {
-      name: "Skip — start from a blank agent",
+      name: "Start from scratch",
     });
     expect(action.hasAttribute("disabled")).toBe(true);
     fireEvent.click(action);
