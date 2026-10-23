@@ -504,6 +504,44 @@ describe("UI session refresh", () => {
     expect(useAuthIssueStore.getState().issue).toBeNull();
   });
 
+  it.each([
+    ["/internal/auth/status", "Endpoint requires localhost access", false],
+    ["/internal/llms/status", "Endpoint requires localhost access", false],
+    ["/tasks", "Endpoint requires localhost access", true],
+    ["/internal/auth/status", "Invalid credentials", true],
+  ])(
+    "classifies diagnostic denial for %s (%s)",
+    async (path, detail, isAuthFailure) => {
+      vi.stubGlobal("fetch", vi.fn().mockResolvedValue(htmlCatchAll()));
+      const { getClient } = await import("./AxiosClient");
+      const { useAuthIssueStore } = await import("@/store/AuthIssueStore");
+      useAuthIssueStore.getState().clearAuthIssue();
+      const client = await getClient(null);
+      const adapter = vi.fn<AxiosAdapter>(async (config) => {
+        throw new AxiosError(
+          "Request failed",
+          AxiosError.ERR_BAD_REQUEST,
+          config,
+          undefined,
+          {
+            data: { detail },
+            status: 403,
+            statusText: "Forbidden",
+            headers: {},
+            config,
+          },
+        );
+      });
+      client.defaults.adapter = adapter;
+      await expect(client.get(path)).rejects.toMatchObject({
+        response: { status: 403 },
+      });
+      expect(adapter).toHaveBeenCalledTimes(1);
+      expect(useAuthIssueStore.getState().issue !== null).toBe(isAuthFailure);
+      if (!isAuthFailure) expect(fetch).not.toHaveBeenCalled();
+    },
+  );
+
   it("holds the first request until the session token is minted", async () => {
     const token = "boot-race-session-canary";
     let releaseMint: (response: Response) => void = () => {};

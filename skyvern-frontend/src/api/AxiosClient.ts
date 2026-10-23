@@ -303,6 +303,17 @@ clients.forEach((instance) => {
       if (axios.isAxiosError(error)) {
         const statusCode = error.response?.status;
         const detail = getResponseDetail(error.response?.data);
+        // Optional local diagnostics are inaccessible through Docker forwarding.
+        // Preserve the rejection for their callers, without refreshing valid credentials.
+        const isLocalDiagnosticsDenied =
+          statusCode === 403 &&
+          detail === "Endpoint requires localhost access" &&
+          ["/internal/auth/status", "/internal/llms/status"].includes(
+            error.config?.url ?? "",
+          );
+        if (isLocalDiagnosticsDenied) {
+          return Promise.reject(error);
+        }
         const isOrganizationAdminDenial =
           getResponseErrorCode(error.response?.data) ===
           "organization_admin_required";
