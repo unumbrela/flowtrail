@@ -1,0 +1,27 @@
+services:
+  postgres:
+    image: public.ecr.aws/docker/library/postgres@sha256:e73790e2702b489f664605acbec5f5da6981bc7e432f0489e52a53c9d1e7467f
+  skyvern:
+    image: public.ecr.aws/skyvern/skyvern@sha256:768e0578f678057cca1ea5d563cb2e42b44f613f0d93a40ae27cbc474a1214a9
+    env_file: !override
+      - .env
+      - .env.bailian
+    ports: !override
+      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:6080:6080"
+  skyvern-ui:
+    image: public.ecr.aws/skyvern/skyvern-ui@sha256:46cb557a83017ee6438a39c0ffc001790624908869b1b0b93045a8fef7d35033
+    volumes:
+      - ./skyvern-frontend/dist:/app/dist.template:ro
+    ports: !override
+      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:9090:9090"
+  form-demo:
+    image: public.ecr.aws/skyvern/skyvern@sha256:768e0578f678057cca1ea5d563cb2e42b44f613f0d93a40ae27cbc474a1214a9
+    entrypoint: ["python", "/demo/server.py"]
+    restart: unless-stopped
+    volumes:
+      - ./local-demo:/demo:ro
+      - ./artifacts/local-demo:/data
+    ports:
+      - "127.0.0.1:8765:8765"

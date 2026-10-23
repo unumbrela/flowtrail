@@ -200,3 +200,12 @@ tmp/
 # Claude
 .claude/*
 !.claude/skills/
+
+# FlowTrail: private local configuration and generated runtime data
+.env.*
+!.env.example
+!.env.bailian.example
+!**/.env.example
+**/.env.local
+LOCAL_SETUP.md
+.publish/
