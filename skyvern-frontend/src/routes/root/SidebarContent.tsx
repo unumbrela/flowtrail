@@ -44,7 +44,7 @@ function SidebarContent({ useCollapsedState }: Props) {
       <SidebarResourceLinks collapsed={collapsed} />
       <div
         className={cn(
-          "mt-auto flex min-h-14 items-center border-t border-neutral-200 dark:border-white/[0.06]",
+          "mt-auto flex min-h-14 items-center border-t border-border/60",
           {
             "justify-center": collapsed,
             "justify-end gap-2 px-3": !collapsed,
@@ -55,6 +55,7 @@ function SidebarContent({ useCollapsedState }: Props) {
         {useCollapsedState ? (
           <Button
             size="icon"
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             variant="ghost"
             className="size-8 text-neutral-500 hover:bg-neutral-200/70 hover:text-neutral-950 dark:hover:bg-white/[0.04] dark:hover:text-neutral-200"
             onClick={() => {

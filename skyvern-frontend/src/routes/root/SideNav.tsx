@@ -79,6 +79,11 @@ function SideNav({ collapsed }: Props = {}) {
       icon: <CompassIcon className="size-4" />,
     },
     {
+      label: "问卷星",
+      to: "/wenjuanxing",
+      icon: <ReaderIcon className="size-4" />,
+    },
+    {
       label: "Agents",
       to: "/agents",
       icon: <LightningBoltIcon className="size-4" />,
