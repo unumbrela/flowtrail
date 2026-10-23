@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>问卷星结构演示 — 本地测试</title>
+<style>
+body{font:18px system-ui;background:#f4f7fa;color:#17202b;margin:30px auto;max-width:700px;padding:20px}section{background:white;padding:24px;border-radius:12px}.field{margin:24px 0}label{display:block;margin:10px 0}input[type=text],input[type=email],select,textarea{font:inherit;padding:8px;width:90%}button{padding:12px 24px;font:inherit;background:#2764db;color:white;border:0;border-radius:8px} [hidden]{display:none!important}
+</style>
+<h1>活动报名问卷（本地测试）</h1>
+<section id="intro"><p>仅用于测试自动填写，不会向外部网站提交。</p><button id="start">开始填写</button></section>
+<form hidden id="survey">
+<section id="page1">
+<h2>第 1 页 / 共 2 页</h2>
+<div class="field" topic="1" type="1"><label class="field-label" for="name">姓名（必填）</label><input id="name" name="full_name" type="text" required></div>
+<div class="field" topic="2" type="1"><label class="field-label" for="email">邮箱（必填）</label><input id="email" name="email" type="email" required></div>
+<div class="field" topic="3" type="7"><label class="field-label" for="role">职业（必填）</label><select id="role" name="role" required><option value="">请选择</option><option>软件工程师</option><option>设计师</option><option>学生</option></select></div>
+<button type="button" id="next">下一页</button>
+</section>
+<section id="page2" hidden>
+<h2>第 2 页 / 共 2 页</h2>
+<div class="field" topic="4" type="3"><p class="field-label">参加方式（必填）</p><label><input type="radio" name="attendance" value="线上" required>线上</label><label><input type="radio" name="attendance" value="线下">线下</label></div>
+<div class="field" topic="5" type="4"><p class="field-label">兴趣爱好（选填，可多选）</p><label><input type="checkbox" name="hobbies" value="阅读">阅读</label><label><input type="checkbox" name="hobbies" value="运动">运动</label><label><input type="checkbox" name="hobbies" value="音乐">音乐</label></div>
+<div class="field" topic="6" type="2"><label class="field-label" for="introduction">个人介绍（必填）</label><textarea id="introduction" name="introduction" required></textarea></div>
+<label><input type="checkbox" name="demo_confirmed" required>确认使用虚构演示信息</label>
+<button type="button" id="back">上一页</button> <button id="submit" type="submit">提交</button>
+</section>
+</form>
+<section id="result" hidden></section>
+<script>
+const survey=document.querySelector('#survey');
+const page1=document.querySelector('#page1');
+const page2=document.querySelector('#page2');
+document.querySelector('#start').onclick=()=>{document.querySelector('#intro').hidden=true;survey.hidden=false};
+document.querySelector('#next').onclick=()=>{for(const el of page1.querySelectorAll('input,select')){if(!el.reportValidity())return}page1.hidden=true;page2.hidden=false};
+document.querySelector('#back').onclick=()=>{page1.hidden=false;page2.hidden=true};
+function snapshot(){const data=Object.fromEntries(new FormData(survey));data.hobbies=new FormData(survey).getAll('hobbies');data.demo_confirmed=survey.elements.demo_confirmed.checked;return data}
+survey.addEventListener('input',()=>{localStorage.setItem('wjx-fixture',JSON.stringify(snapshot()))});
+survey.onsubmit=async(event)=>{event.preventDefault();const data=snapshot();const response=await fetch('/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});if(!response.ok){alert('提交失败');return}const receipt=await response.json();localStorage.setItem('wjx-receipt',JSON.stringify(receipt));survey.hidden=true;const result=document.querySelector('#result');result.hidden=false;result.textContent='提交成功，答卷已收到。回执：'+receipt.receipt_id};
+</script>
+</html>

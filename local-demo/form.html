@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>Agent application demo</title>
+<style>body{font:18px system-ui;background:#f0f4f8;color:#172b4d;max-width:640px;margin:36px auto;padding:28px;background:white}label{display:block;margin:16px 0}input:not([type=checkbox]),select,textarea{display:block;width:95%;padding:10px;margin-top:6px;font:inherit;border:1px solid #aaa;border-radius:6px}button{background:#245ddd;color:white;padding:12px 24px;border:0;border-radius:6px;font:inherit}pre{white-space:pre-wrap}</style>
+<h1>Agent application demo</h1><p>Local test only. Use fictional details. No real job application is sent.</p>
+<form id="application">
+<label>Full name<input name="full_name" required></label>
+<label>Email<input name="email" type="email" required></label>
+<label>Role<select name="role" required><option value="">Choose a role</option><option>Agent Engineer</option><option>Frontend Engineer</option><option>Backend Engineer</option></select></label>
+<label>Introduction<textarea name="introduction" required rows="2"></textarea></label>
+<label><input name="demo_confirmed" type="checkbox" required> I confirm these are fictional demo details</label>
+<button type="submit">Submit demo application</button></form>
+<section id="receipt" hidden><h2>Application received</h2><p>Demo submission successful.</p><pre id="result"></pre></section>
+<script>document.querySelector('form').addEventListener('submit',async e=>{e.preventDefault();const data=Object.fromEntries(new FormData(e.target));const response=await fetch('/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});if(!response.ok){alert('Submission failed');return;}document.querySelector('#result').textContent=JSON.stringify(await response.json(),null,2);e.target.hidden=true;document.querySelector('#receipt').hidden=false;});</script></html>
