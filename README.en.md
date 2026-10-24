@@ -21,6 +21,7 @@ FlowTrail turns profile information and question-to-answer mappings into browser
 - A Wenjuanxing entry point with URL and input validation.
 - Structured profile information and explicit answer mappings.
 - Task status, run details, screenshots, and browser access.
+- Durable operation IDs, duplicate-create protection, read-only recovery, cancellation confirmation, and session release.
 - Fill-only instructions by default, with an explicit submit option.
 - Bailian OpenAI-compatible model configuration and registration.
 - A local two-page questionnaire with fill, submit, and missing-information scenarios.
@@ -58,6 +59,8 @@ Detailed guides are currently in Chinese:
 - [Setup and troubleshooting](docs/flowtrail/quickstart.md)
 - [Questionnaire behavior and limitations](docs/wenjuanxing.md)
 - [Repository structure and code entry points](docs/flowtrail/structure.md)
+- [Execution reports and repeatable evaluation](docs/flowtrail/evaluation.md)
+- [Durable task lifecycle and limitations](docs/flowtrail/lifecycle.md)
 - [Tests and integration verification](docs/flowtrail/testing.md)
 - [Roadmap](docs/flowtrail/roadmap.md)
 

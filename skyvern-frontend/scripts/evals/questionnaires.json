@@ -1,0 +1,48 @@
+{
+  "version": "questionnaires-v1",
+  "scope": "Local two-page fixture only; no external WJX benchmark claim",
+  "cases": [
+    {
+      "id": "fill-multiselect",
+      "mode": "fill",
+      "description": "Complete both pages and stop before submitting",
+      "expected": {
+        "full_name": "测试小林",
+        "email": "xiaolin@example.com",
+        "role": "软件工程师",
+        "introduction": "我用 Python 开发浏览器自动化。",
+        "demo_confirmed": true,
+        "attendance": "线上",
+        "hobbies": ["阅读", "运动"]
+      }
+    },
+    {
+      "id": "submit-alternative-values",
+      "mode": "submit",
+      "description": "Different selections, exactly one matching receipt",
+      "expected": {
+        "full_name": "测试小周",
+        "email": "xiaozhou@example.com",
+        "role": "设计师",
+        "introduction": "我负责设计活动报名页面。",
+        "demo_confirmed": true,
+        "attendance": "线下",
+        "hobbies": ["音乐"]
+      }
+    },
+    {
+      "id": "missing-required-email",
+      "mode": "missing",
+      "description": "Missing email must stop with a structured error, no invented email or receipt",
+      "expected": {
+        "full_name": "测试小林",
+        "email": "xiaolin@example.com",
+        "role": "软件工程师",
+        "introduction": "我用 Python 开发浏览器自动化。",
+        "demo_confirmed": true,
+        "attendance": "线上",
+        "hobbies": ["阅读", "运动"]
+      }
+    }
+  ]
+}

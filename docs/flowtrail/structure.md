@@ -22,6 +22,7 @@ flowtrail/                       # 仓库根目录，本地名称可能为 skyve
 │   ├── src/api/                # API 客户端
 │   ├── src/hooks/              # 共享 hooks 与本地诊断
 │   └── scripts/                # 浏览器集成验证
+├── flowtrail_service/           # FlowTrail 持久化编排、恢复与会话管理
 ├── skyvern/                     # Python Agent、API、CLI、浏览器执行
 ├── local-demo/                  # 中文演示问卷和回执服务
 ├── scripts/                     # 模型配置、维护与部署脚本
@@ -62,6 +63,9 @@ flowtrail/                       # 仓库根目录，本地名称可能为 skyve
 - 前端场景代码和组件测试就近放置；真实模型集成脚本放在 `skyvern-frontend/scripts/`。
 - 可公开的演示数据使用虚构资料，问卷夹具放在 `local-demo/`。
 - `.env`、运行截图、回执、`artifacts/`、`node_modules/`、构建产物属于本地数据，不作为项目展示素材直接提交。
+- `.flowtrail/` 是持久化幂等记录，虽不提交 Git，但不能当作测试缓存删除。
 - 保留根目录的 Docker、Python、迁移和工具配置，以维持现有命令和上游兼容。
 
 本轮整理采用“统一入口 + 分类文档”，没有移动运行时代码。后续如需迁移目录，必须同步检查导入、Docker 挂载、脚本路径、CI 和文档链接。
+
+执行报告边界位于 `flowtrail_service/report.py`，页面组件为 `skyvern-frontend/src/routes/wenjuanxing/ExecutionReport.tsx`。固定场景存放在 `skyvern-frontend/scripts/evals/`，批量入口是 `evaluate-questionnaires.mjs`，汇总口径由 `eval-summary.mjs` 定义。结果在忽略的 `artifacts/evaluations/`；不要与持久化 operation 账本 `.flowtrail/` 混用。

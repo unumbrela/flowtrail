@@ -46,3 +46,7 @@ python3 scripts/setup_bailian.py
 ## 下一步
 
 阅读[问卷使用说明](../wenjuanxing.md)，或运行[验证指南](testing.md)中的定向测试。
+
+## 任务编排服务
+
+Compose 同时启动 `flowtrail`，使用本机 8001 端口。用 `curl http://localhost:8001/health` 检查服务。升级代码后执行 `docker compose restart flowtrail`。数据库保存在 `.flowtrail/`，请保留该目录；详细协议、恢复边界和测试见[任务生命周期](lifecycle.md)。

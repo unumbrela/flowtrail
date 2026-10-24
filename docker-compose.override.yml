@@ -25,3 +25,25 @@ services:
       - ./artifacts/local-demo:/data
     ports:
       - "127.0.0.1:8765:8765"
+  flowtrail:
+    image: public.ecr.aws/skyvern/skyvern@sha256:768e0578f678057cca1ea5d563cb2e42b44f613f0d93a40ae27cbc474a1214a9
+    entrypoint: ["python", "-m", "uvicorn", "flowtrail_service.api:create_app", "--factory", "--app-dir", "/workspace", "--host", "0.0.0.0", "--port", "8001", "--workers", "1"]
+    restart: unless-stopped
+    environment:
+      SKYVERN_URL: http://skyvern:8000
+      FLOWTRAIL_DB: /data/operations.sqlite3
+      FLOWTRAIL_ALLOW_FIXTURE: "true"
+      FLOWTRAIL_ORIGINS: "${FLOWTRAIL_ORIGINS:-http://localhost:8080,http://127.0.0.1:8080}"
+    volumes:
+      - ./flowtrail_service:/workspace/flowtrail_service:ro
+      - ./.flowtrail:/data
+    ports:
+      - "127.0.0.1:8001:8001"
+    depends_on:
+      skyvern:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health', timeout=5)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

@@ -11,7 +11,7 @@ import {
 import { useAuthIssueStore } from "@/store/AuthIssueStore";
 import axios, { AxiosHeaders, type InternalAxiosRequestConfig } from "axios";
 
-type ApiVersion = "sans-api-v1" | "v1" | "v2";
+type ApiVersion = "sans-api-v1" | "v1" | "v2" | "flowtrail";
 
 const apiV1BaseUrl = apiBaseUrl;
 const apiV2BaseUrl = apiBaseUrl.replace("v1", "v2");
@@ -55,7 +55,18 @@ const artifactApiClient = axios.create({
   baseURL: artifactApiBaseUrl,
 });
 
-const clients = [client, v2Client, clientSansApiV1] as const;
+const flowtrailClient = axios.create({
+  baseURL:
+    import.meta.env.VITE_FLOWTRAIL_API_BASE_URL ||
+    `${url.protocol}//${url.hostname}:8001/v1`,
+  timeout: 75000,
+  headers: {
+    "Content-Type": "application/json",
+    "x-user-agent": "flowtrail-ui",
+    ...apiKeyHeader,
+  },
+});
+const clients = [client, v2Client, clientSansApiV1, flowtrailClient] as const;
 
 type AttributionResolver = (
   authorization: string | undefined,
@@ -395,6 +406,8 @@ function getClientForVersion(version: ApiVersion) {
   switch (version) {
     case "sans-api-v1":
       return clientSansApiV1;
+    case "flowtrail":
+      return flowtrailClient;
     case "v1":
       return client;
     case "v2":

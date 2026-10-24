@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "suite_id": "2026-10-24T09-38-25.464Z-1bcf7112",
+  "dataset_version": "questionnaires-v1",
+  "scope": "Local two-page fixture only; no external WJX benchmark claim",
+  "started_at": "2026-10-24T09:38:25.465Z",
+  "environment": {
+    "node": "v24.15.0",
+    "git_commit": "18c3b83a61e3c3720472516f676dd0bf1e9c1144",
+    "working_tree_dirty": true,
+    "source_sha256": {
+      "skyvern-frontend/scripts/evals/questionnaires.json": "4c7b7cb46197b47d48009c670931d2887960cde16bf2532b7fa82b517bc728d7",
+      "skyvern-frontend/scripts/wenjuanxing-smoke.mjs": "0271037b6a64193820516fea8c5a6ab2009196ca8665420313c9d3948a422ea4",
+      "skyvern-frontend/scripts/questionnaire-evidence.mjs": "0579b98ffa766631fc88e0afbd93ec3562aab1b56860ba40c8b9da0e7fc62d10",
+      "skyvern-frontend/scripts/evaluate-questionnaires.mjs": "d5baa644e8fad6b27f9233857dfc7287e88911ccd2494b2b02df57a5548c04bd",
+      "skyvern-frontend/scripts/eval-summary.mjs": "a0112f9c4744624d5782b0ad05cf408c330dd26a69bae88424f00520075943e4",
+      "skyvern-frontend/src/routes/wenjuanxing/wenjuanxing.ts": "685599e496ba779797f206c7f89ac0af2f31e7fe243c2d11d930f87c2d2eeb36",
+      "flowtrail_service/coordinator.py": "817a86751282d2a325d587fce8a0268f7d0456a94bd28d09733331b6846f66bf",
+      "flowtrail_service/api.py": "ce6f33a6e2ef3f0c856e1e7eba569518262b2ba085417e0e38de76ccb2e4a935",
+      "local-demo/server.py": "93b0397623350e6ace62252de519369326070a6189e63092c02fcb811b6031c9",
+      "local-demo/wjx.html": "b934dddec5893fc3863bfd56421fad5be6f2781d96407d53c3b55554f7915da3"
+    },
+    "model": null,
+    "model_label_source": "not_recorded",
+    "tokens": null,
+    "cost": null
+  },
+  "attempts": [
+    {
+      "scenario_id": "fill-multiselect",
+      "mode": "fill",
+      "repetition": 1,
+      "outcome": "evidence_failed",
+      "started_at": "2026-10-24T09:38:25.529Z",
+      "elapsed_seconds": 54.16,
+      "exit_code": 1,
+      "operation_id": "3b77a035527e479099cc29290bed23e4",
+      "run_id": "tsk_589061234764485512",
+      "case_id": "254d30123c0d4df4bc9764317586101b",
+      "verification": "01/tsk_589061234764485512-verification.json",
+      "failures": [
+        "DOM mismatch: introduction",
+        "DOM mismatch: demo_confirmed",
+        "DOM mismatch: attendance",
+        "DOM mismatch: hobbies"
+      ]
+    },
+    {
+      "scenario_id": "submit-alternative-values",
+      "mode": "submit",
+      "repetition": 1,
+      "outcome": "passed",
+      "started_at": "2026-10-24T09:39:19.691Z",
+      "elapsed_seconds": 74.61,
+      "exit_code": 0,
+      "operation_id": "fd8fea756ced41b79c58dda10192149c",
+      "run_id": "tsk_589061462397752324",
+      "case_id": "ed6f540ecbde425fbd6b6ef7a29a1901",
+      "verification": "02/tsk_589061462397752324-verification.json",
+      "failures": []
+    },
+    {
+      "scenario_id": "missing-required-email",
+      "mode": "missing",
+      "repetition": 1,
+      "outcome": "passed",
+      "started_at": "2026-10-24T09:40:34.301Z",
+      "elapsed_seconds": 50.27,
+      "exit_code": 0,
+      "operation_id": "9a58f7a1716548c4bf6517084443a456",
+      "run_id": "tsk_589061784520299736",
+      "case_id": "b4cba403928a4b4088580d3fd320d7ee",
+      "verification": "03/tsk_589061784520299736-verification.json",
+      "failures": []
+    },
+    {
+      "scenario_id": "fill-multiselect",
+      "mode": "fill",
+      "repetition": 2,
+      "outcome": "passed",
+      "started_at": "2026-10-24T09:41:24.571Z",
+      "elapsed_seconds": 95.99,
+      "exit_code": 0,
+      "operation_id": "1ac94c7e861c477589a02556baf0e179",
+      "run_id": "tsk_589061999268664688",
+      "case_id": "b75c19fb645648838960c257b52f5833",
+      "verification": "04/tsk_589061999268664688-verification.json",
+      "failures": []
+    },
+    {
+      "scenario_id": "submit-alternative-values",
+      "mode": "submit",
+      "repetition": 2,
+      "outcome": "passed",
+      "started_at": "2026-10-24T09:43:00.561Z",
+      "elapsed_seconds": 84.08,
+      "exit_code": 0,
+      "operation_id": "e24798df3e544b4a9df3337cb284bd90",
+      "run_id": "tsk_589062411585525302",
+      "case_id": "818cb475f6e24d2782215e5618e1e3d3",
+      "verification": "05/tsk_589062411585525302-verification.json",
+      "failures": []
+    },
+    {
+      "scenario_id": "missing-required-email",
+      "mode": "missing",
+      "repetition": 2,
+      "outcome": "passed",
+      "started_at": "2026-10-24T09:44:24.641Z",
+      "elapsed_seconds": 281,
+      "exit_code": 0,
+      "operation_id": "abc71133c9d24536a89f483e3f916b2f",
+      "run_id": "tsk_589062772362778364",
+      "case_id": "5b0c932fc8934fbdbbf46b38f5f0d816",
+      "verification": "06/tsk_589062772362778364-verification.json",
+      "failures": []
+    }
+  ],
+  "summary": {
+    "planned": 6,
+    "finished": 6,
+    "passed": 5,
+    "pass_rate": 0.8333333333333334,
+    "outcomes": {
+      "evidence_failed": 1,
+      "passed": 5
+    },
+    "latency_seconds": {
+      "sample_count": 6,
+      "p50": 74.61,
+      "p95": 281
+    }
+  },
+  "finished_at": "2026-10-24T09:49:05.649Z"
+}

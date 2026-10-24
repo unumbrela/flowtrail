@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "suite_id": "2026-10-24T09-49-27.193Z-58a7c214",
+  "dataset_version": "questionnaires-v1",
+  "scope": "Local two-page fixture only; no external WJX benchmark claim",
+  "started_at": "2026-10-24T09:49:27.197Z",
+  "environment": {
+    "node": "v24.15.0",
+    "git_commit": "18c3b83a61e3c3720472516f676dd0bf1e9c1144",
+    "working_tree_dirty": true,
+    "source_sha256": {
+      "skyvern-frontend/scripts/evals/questionnaires.json": "4c7b7cb46197b47d48009c670931d2887960cde16bf2532b7fa82b517bc728d7",
+      "skyvern-frontend/scripts/wenjuanxing-smoke.mjs": "0b5be64359be03d38bc90e7f4333fc101fa709fc6669cf5c539be7e5188fa399",
+      "skyvern-frontend/scripts/questionnaire-evidence.mjs": "7f8d6bc8f0a731fddf2180629315de98e474c9b8299e634cd10ac5f0b3b1bafe",
+      "skyvern-frontend/scripts/evaluate-questionnaires.mjs": "9378408a570cd4d6392dc1d7f152a02118970e3b34920eeefb21c914f1b074dd",
+      "skyvern-frontend/scripts/eval-summary.mjs": "9347619c5fdef09f67dea75def57002c024e074db691c5d523e61751506f98c9",
+      "skyvern-frontend/scripts/eval-environment.mjs": "f11d209b3fc9cce95a4a1b0c7701018acd233de81306147562b092ee0609fb5d",
+      "skyvern-frontend/src/routes/wenjuanxing/wenjuanxing.ts": "99cd206485a3faf2fff221ef7bd096b4950864d9e156caccb744c73a4e4660ca",
+      "flowtrail_service/coordinator.py": "817a86751282d2a325d587fce8a0268f7d0456a94bd28d09733331b6846f66bf",
+      "flowtrail_service/api.py": "ce6f33a6e2ef3f0c856e1e7eba569518262b2ba085417e0e38de76ccb2e4a935",
+      "local-demo/server.py": "93b0397623350e6ace62252de519369326070a6189e63092c02fcb811b6031c9",
+      "local-demo/wjx.html": "b934dddec5893fc3863bfd56421fad5be6f2781d96407d53c3b55554f7915da3"
+    },
+    "configured_model": {
+      "source": "configuration_api_not_per_call_telemetry",
+      "status": "resolved",
+      "model_name": "qwen3.5-plus",
+      "provider": "openai_compatible",
+      "temperature": 0,
+      "max_completion_tokens": 8192,
+      "reasoning_effort": null,
+      "observed_at": "2026-10-24T09:49:27.309Z"
+    },
+    "model": null,
+    "model_label_source": "not_recorded",
+    "tokens": null,
+    "cost": null
+  },
+  "attempts": [
+    {
+      "scenario_id": "fill-multiselect",
+      "mode": "fill",
+      "repetition": 1,
+      "outcome": "passed",
+      "started_at": "2026-10-24T09:49:27.311Z",
+      "elapsed_seconds": 92.96,
+      "exit_code": 0,
+      "operation_id": "938337538d2049e4a5fee733d77336b1",
+      "run_id": "tsk_589064073737868036",
+      "case_id": "31e53ce7501142959b3cbba755e66108",
+      "verification": "01/tsk_589064073737868036-verification.json",
+      "failures": []
+    },
+    {
+      "scenario_id": "fill-multiselect",
+      "mode": "fill",
+      "repetition": 2,
+      "outcome": "passed",
+      "started_at": "2026-10-24T09:51:00.276Z",
+      "elapsed_seconds": 77.66,
+      "exit_code": 0,
+      "operation_id": "f0b59eb96c5f48c0a7ced90948d111a6",
+      "run_id": "tsk_589064473169826752",
+      "case_id": "0980b60ac82b415eb7fd32867b17a79e",
+      "verification": "02/tsk_589064473169826752-verification.json",
+      "failures": []
+    }
+  ],
+  "summary": {
+    "planned": 2,
+    "finished": 2,
+    "passed": 2,
+    "pass_rate": 1,
+    "outcomes": {
+      "passed": 2
+    },
+    "latency_seconds": {
+      "sample_count": 2,
+      "p50": 77.66,
+      "p95": 92.96
+    }
+  },
+  "finished_at": "2026-10-24T09:52:17.940Z"
+}

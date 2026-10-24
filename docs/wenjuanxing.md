@@ -8,7 +8,7 @@
 4. 点击“开始填写”。默认只填写；需要自动提交时勾选“填写后自动提交”。
 5. 页面显示任务进度，点击“打开浏览器”查看或手动补充，点击“查看运行详情”查看操作与截图。
 
-填写资料不会额外写入浏览器 localStorage，但会作为任务内容发送至当前模型并保存到运行记录。浏览器会话最多保留 60 分钟。刷新此页面不会恢复表单或进度卡片，已启动任务可从 Runs 和 Browsers 中找回。
+填写资料不会额外写入浏览器 localStorage，但会作为任务内容发送至当前模型并保存到运行记录。浏览器会话最多保留 60 分钟。新任务在发送前将 operation ID 写入 URL，刷新后通过编排服务查询原运行，不会再次创建任务。资料与答案不写入 URL，也不会在刷新后恢复。旧版 run/session 链接仍可查看。原请求仍在内存时可以使用同一编号重发；详情见[任务生命周期](flowtrail/lifecycle.md)。
 
 缺少必填信息、答案冲突时要求 Agent 停止并报告具体问题；遇到登录或验证码也要求停止，用户可在保留的浏览器中处理。自动提交只要求提交一份，需确认成功页面；网络异常不会自动重试任务创建。创建结果不确定时，请先检查运行记录。
 
@@ -31,7 +31,7 @@
 - `skyvern-frontend/src/api/AxiosClient.ts`：仅对两个可选本地诊断接口的特定 localhost 限制响应跳过鉴权错误提示；真正的鉴权失败仍报告。
 - `local-demo/wjx.html`：带入口页与两页中文题目的本地演示问卷。
 
-使用现有 `POST /v1/browser_sessions`（60 分钟）和 `POST /v1/run/tasks`，执行引擎 `skyvern-1.0`、无代理、最多 30 步。没有数据库迁移或后端镜像变更。
+使用现有 `POST /v1/browser_sessions`（60 分钟）和 `POST /v1/run/tasks`，执行引擎 `skyvern-1.0`、无代理、最多 30 步。Skyvern 数据库和固定后端镜像保持兼容；新增 FlowTrail 独立 SQLite 编排记录和服务。
 
 ## 验证与边界
 
@@ -56,9 +56,9 @@ node scripts/wenjuanxing-smoke.mjs submit
 node scripts/wenjuanxing-smoke.mjs missing
 ```
 
-脚本使用实际前端任务生成器，只将测试目标替换成本地演示问卷。它核对最终状态和服务端回执数量/字段，单选与多选结果需结合运行截图检查。每次使用独立浏览器会话，结束后关闭；轮询超时则保留运行 ID 供排查。
+脚本使用实际前端任务生成器，只将测试目标替换成本地演示问卷。每次执行使用独立 case ID，夹具从 DOM 采集真实字段状态，并将观测与提交回执分别保存。脚本核对文本、下拉、单选、多选及确认框；fill 要求停在第二页且零回执，submit 要求恰好一份字段匹配的回执，missing 要求结构化 `MISSING_INFORMATION` 错误指出邮箱且观测到邮箱为空。每次使用独立浏览器会话，结束后关闭；轮询超时则保留运行 ID 供排查。
 
-相关单元与组件测试共 86 项通过；TypeScript、定向 ESLint 和生产构建通过。本机未安装 `pre-commit`，因此未完成 `pre-commit run --all-files` 全仓检查。
+历史版本相关单元与组件测试共 86 项通过；该历史记录的 TypeScript、定向 ESLint 和生产构建通过。当前验证命令与范围见[验证指南](flowtrail/testing.md)。本机未安装 `pre-commit`，因此未完成 `pre-commit run --all-files` 全仓检查。
 
 本次实际浏览器验证：
 

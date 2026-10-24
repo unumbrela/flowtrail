@@ -27,14 +27,33 @@ body{font:18px system-ui;background:#f4f7fa;color:#17202b;margin:30px auto;max-w
 </form>
 <section id="result" hidden></section>
 <script>
+const caseId=new URLSearchParams(location.search).get('case');
 const survey=document.querySelector('#survey');
+// Fixture instrumentation reads actual DOM state; it never fills answers.
+let pendingObservation=Promise.resolve();
+let lastObservation='';
+function observe(){
+  if(!/^[a-f0-9]{32}$/.test(caseId || ''))return;
+  const payload=JSON.stringify({case_id:caseId,values:snapshot(),page:survey.hidden?0:(page1.hidden?2:1)});
+  if(payload===lastObservation)return;
+  lastObservation=payload;
+  pendingObservation=pendingObservation.then(async()=>{
+    const response=await fetch('/observe',{method:'POST',headers:{'Content-Type':'application/json'},body:payload});
+    if(!response.ok)throw new Error('Evidence capture failed');
+  }).catch(()=>{lastObservation=''});
+}
+
 const page1=document.querySelector('#page1');
 const page2=document.querySelector('#page2');
-document.querySelector('#start').onclick=()=>{document.querySelector('#intro').hidden=true;survey.hidden=false};
-document.querySelector('#next').onclick=()=>{for(const el of page1.querySelectorAll('input,select')){if(!el.reportValidity())return}page1.hidden=true;page2.hidden=false};
-document.querySelector('#back').onclick=()=>{page1.hidden=false;page2.hidden=true};
+document.querySelector('#start').onclick=()=>{document.querySelector('#intro').hidden=true;survey.hidden=false;observe()};
+document.querySelector('#next').onclick=()=>{for(const el of page1.querySelectorAll('input,select')){if(!el.reportValidity())return}page1.hidden=true;page2.hidden=false;observe()};
+document.querySelector('#back').onclick=()=>{page1.hidden=false;page2.hidden=true;observe()};
 function snapshot(){const data=Object.fromEntries(new FormData(survey));data.hobbies=new FormData(survey).getAll('hobbies');data.demo_confirmed=survey.elements.demo_confirmed.checked;return data}
-survey.addEventListener('input',()=>{localStorage.setItem('wjx-fixture',JSON.stringify(snapshot()))});
-survey.onsubmit=async(event)=>{event.preventDefault();const data=snapshot();const response=await fetch('/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});if(!response.ok){alert('提交失败');return}const receipt=await response.json();localStorage.setItem('wjx-receipt',JSON.stringify(receipt));survey.hidden=true;const result=document.querySelector('#result');result.hidden=false;result.textContent='提交成功，答卷已收到。回执：'+receipt.receipt_id};
+survey.addEventListener('input',observe);
+survey.addEventListener('change',observe);
+// Also observe programmatic DOM changes that do not dispatch input events.
+setInterval(observe,500);
+observe();
+survey.onsubmit=async(event)=>{event.preventDefault();const data=snapshot();if(caseId)data.case_id=caseId;observe();await pendingObservation;const response=await fetch('/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});if(!response.ok){alert('提交失败');return}const receipt=await response.json();localStorage.setItem('wjx-receipt',JSON.stringify(receipt));survey.hidden=true;const result=document.querySelector('#result');result.hidden=false;result.textContent='提交成功，答卷已收到。回执：'+receipt.receipt_id};
 </script>
 </html>

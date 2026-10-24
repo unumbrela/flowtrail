@@ -209,3 +209,6 @@ tmp/
 **/.env.local
 LOCAL_SETUP.md
 .publish/
+
+# Durable FlowTrail idempotency ledger (not disposable test artifacts)
+.flowtrail/

@@ -1,6 +1,6 @@
 import { useRef, useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { Link, useSearchParams } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PlusIcon, ReloadIcon, TrashIcon } from "@radix-ui/react-icons";
 import { getClient } from "@/api/AxiosClient";
 import { useCredentialGetter } from "@/hooks/useCredentialGetter";
@@ -14,6 +14,8 @@ import {
   type QuestionnaireAnswer,
 } from "./wenjuanxing";
 
+import { ExecutionReport } from "./ExecutionReport";
+
 const statusLabels: Record<string, string> = {
   created: "等待启动",
   queued: "排队中",
@@ -25,6 +27,20 @@ const statusLabels: Record<string, string> = {
   canceled: "已取消",
 };
 
+type Operation = {
+  id: string;
+  state: string;
+  session_id?: string | null;
+  run_id?: string | null;
+  submit: boolean | number;
+  run_status?: string;
+  failure_reason?: string | null;
+  session_state?: string | null;
+  detail?: string | null;
+  can_cancel?: boolean;
+  can_close?: boolean;
+};
+
 function WenjuanxingPage() {
   const credentialGetter = useCredentialGetter();
   const [url, setUrl] = useState("");
@@ -32,61 +48,137 @@ function WenjuanxingPage() {
   const [answers, setAnswers] = useState<QuestionnaireAnswer[]>([]);
   const [submit, setSubmit] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const [run, setRun] = useState<{ id: string; submit: boolean } | null>(null);
+  // Persist references only: profile information and answers never enter the URL.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryClient = useQueryClient();
+  const operationId = searchParams.get("operation");
+  const runId = searchParams.get("run");
+  const storedSessionId = searchParams.get("session");
+  const invalidReference =
+    (!!operationId && !/^[a-f0-9]{32}$/.test(operationId)) ||
+    (!!runId && !/^tsk_[a-zA-Z0-9_-]+$/.test(runId)) ||
+    (!!storedSessionId && !/^pbs_[a-zA-Z0-9_-]+$/.test(storedSessionId));
   const inFlight = useRef(false);
+  const attempt = useRef<{
+    id: string;
+    request: ReturnType<typeof buildQuestionnaireRequest>;
+    submit: boolean;
+  } | null>(null);
+
+  function resetReferences() {
+    setSearchParams(
+      (previous) => {
+        const next = new URLSearchParams(previous);
+        for (const key of ["run", "session", "mode", "operation"])
+          next.delete(key);
+        return next;
+      },
+      { replace: true },
+    );
+    attempt.current = null;
+    setError(null);
+    mutation.reset();
+  }
 
   const mutation = useMutation({
     retry: false,
-    mutationFn: async (
-      request: ReturnType<typeof buildQuestionnaireRequest>,
-    ) => {
-      const client = await getClient(credentialGetter, "sans-api-v1");
-      const session = await client.post<{ browser_session_id: string }>(
-        "/browser_sessions",
-        {
-          timeout: 60,
-          proxy_location: "NONE",
-          needs_live_view: true,
-        },
-      );
-      const id = session.data.browser_session_id;
-      setSessionId(id);
-      // Keep this session available if task creation fails, so the user can inspect it.
-      const response = await client.post<{ run_id: string }>("/run/tasks", {
-        ...request,
-        browser_session_id: id,
+    mutationFn: async (input: NonNullable<typeof attempt.current>) => {
+      const client = await getClient(credentialGetter, "flowtrail");
+      const response = await client.post<Operation>(`/operations/${input.id}`, {
+        request: input.request,
+        submit: input.submit,
       });
       return response.data;
     },
-    onSuccess: (data) => setRun({ id: data.run_id, submit }),
+    onSuccess: (data) => {
+      queryClient.setQueryData(["flowtrail-operation", data.id], data);
+      setError(null);
+    },
     onError: () =>
       setError(
-        "启动未确认成功。请先到运行记录检查是否已创建任务，避免重复填写；资料已保留。",
+        "启动结果尚未确认。请按原请求编号继续确认，避免重复填写；资料已保留。",
       ),
     onSettled: () => {
       inFlight.current = false;
     },
   });
 
+  const operationQuery = useQuery({
+    queryKey: ["flowtrail-operation", operationId],
+    enabled: !!operationId && !invalidReference && !mutation.isPending,
+    retry: false,
+    queryFn: async () => {
+      const client = await getClient(credentialGetter, "flowtrail");
+      return (await client.get<Operation>(`/operations/${operationId}`)).data;
+    },
+    refetchInterval: (query) =>
+      query.state.data?.session_state === "closed" &&
+      terminalRunStatuses.has(query.state.data?.run_status ?? "")
+        ? false
+        : 3000,
+  });
+  const operation = operationId ? operationQuery.data : undefined;
+  const actualRunId = operationId ? operation?.run_id : runId;
+  const run =
+    actualRunId && !invalidReference
+      ? {
+          id: actualRunId,
+          submit: operationId
+            ? !!operation?.submit
+            : searchParams.get("mode") === "submit"
+              ? true
+              : searchParams.get("mode") === "fill"
+                ? false
+                : null,
+        }
+      : null;
+  // Retain compatibility with links produced before the coordinator existed.
   const runQuery = useQuery({
     queryKey: ["wenjuanxing-run", run?.id],
-    enabled: !!run,
+    enabled: !!run && !operationId,
     queryFn: async () => {
       const client = await getClient(credentialGetter, "sans-api-v1");
-      const response = await client.get<{
-        status: string;
-        failure_reason?: string | null;
-      }>(`/runs/${run!.id}`);
-      return response.data;
+      return (
+        await client.get<{
+          status: string;
+          failure_reason?: string | null;
+          browser_session_id?: string | null;
+        }>(`/runs/${run!.id}`)
+      ).data;
     },
     refetchInterval: (query) =>
       terminalRunStatuses.has(query.state.data?.status ?? "") ? false : 3000,
   });
+  const runData = operationId
+    ? {
+        status: operation?.run_status,
+        failure_reason: operation?.failure_reason,
+      }
+    : runQuery.data;
+  const queryFailed = operationId ? operationQuery.isError : runQuery.isError;
+  const sessionId = invalidReference
+    ? null
+    : operationId
+      ? operation?.session_id
+      : (runQuery.data?.browser_session_id ?? storedSessionId);
+  const sessionClosed =
+    operation?.session_state === "closed" ||
+    operation?.session_state === "unavailable";
+  const actionMutation = useMutation({
+    retry: false,
+    mutationFn: async (action: "cancel" | "close") => {
+      const client = await getClient(credentialGetter, "flowtrail");
+      await client.post(`/operations/${operationId}/${action}`, {});
+    },
+    onSettled: () => {
+      void operationQuery.refetch();
+    },
+  });
 
   function start(event: FormEvent) {
     event.preventDefault();
-    if (inFlight.current || run || sessionId) return;
+    if (inFlight.current || operationId || run || sessionId || invalidReference)
+      return;
     setError(null);
     try {
       const request = buildQuestionnaireRequest({
@@ -95,15 +187,32 @@ function WenjuanxingPage() {
         answers,
         submit,
       });
+      const id = crypto.randomUUID().replace(/-/g, "");
+      attempt.current = { id, request, submit };
       inFlight.current = true;
-      mutation.mutate(request);
+      // Write the correlation reference before sending any side-effecting request.
+      setSearchParams(
+        (previous) => {
+          const next = new URLSearchParams(previous);
+          next.set("operation", id);
+          return next;
+        },
+        { replace: true },
+      );
+      mutation.mutate(attempt.current);
     } catch (cause) {
+      inFlight.current = false;
       setError(cause instanceof Error ? cause.message : "请检查填写内容。");
     }
   }
 
-  const locked = mutation.isPending || !!run || !!sessionId;
-  const finished = terminalRunStatuses.has(runQuery.data?.status ?? "");
+  const locked =
+    mutation.isPending ||
+    !!operationId ||
+    !!run ||
+    !!sessionId ||
+    invalidReference;
+  const finished = terminalRunStatuses.has(runData?.status ?? "");
 
   return (
     <div className="mx-auto w-full max-w-3xl space-y-7 pb-12">
@@ -114,6 +223,14 @@ function WenjuanxingPage() {
           粘贴问卷链接，提供资料和答案，FlowTrail 会在浏览器中逐题填写。
         </p>
       </header>
+      {invalidReference && (
+        <div role="alert" className="space-y-2 text-sm text-destructive">
+          <p>运行链接格式无效，未发起任务或状态请求。</p>
+          <Button variant="outline" onClick={resetReferences}>
+            清除无效链接
+          </Button>
+        </div>
+      )}
       <form onSubmit={start} className="space-y-6">
         <fieldset disabled={locked} className="space-y-6 disabled:opacity-70">
           <div className="space-y-2">
@@ -212,7 +329,7 @@ function WenjuanxingPage() {
             <label className="flex items-center gap-3 text-sm font-medium">
               <input
                 type="checkbox"
-                checked={submit}
+                checked={run?.submit ?? submit}
                 onChange={(e) => setSubmit(e.target.checked)}
               />
               填写后自动提交
@@ -223,7 +340,7 @@ function WenjuanxingPage() {
             </p>
           </div>
         </fieldset>
-        {error && (
+        {error && !run && (
           <div role="alert" className="text-sm text-destructive">
             {error}{" "}
             <Link to="/runs" className="underline">
@@ -231,7 +348,7 @@ function WenjuanxingPage() {
             </Link>
           </div>
         )}
-        {!run && !sessionId && (
+        {!operationId && !run && !sessionId && (
           <Button type="submit" disabled={locked}>
             {mutation.isPending && <ReloadIcon className="mr-2 animate-spin" />}
             {mutation.isPending
@@ -242,38 +359,43 @@ function WenjuanxingPage() {
           </Button>
         )}
       </form>
-      {(sessionId || run) && (
+      {(operationId || sessionId || run) && (
         <section
           className="space-y-3 rounded-lg border bg-muted/30 p-5"
           aria-label="填写进度"
         >
           <p role="status" className="font-medium">
             {run
-              ? (statusLabels[runQuery.data?.status ?? "created"] ??
-                runQuery.data?.status)
+              ? runData?.status
+                ? (statusLabels[runData.status] ?? runData.status)
+                : "正在获取任务状态…"
               : mutation.isPending
-                ? "浏览器已创建，正在启动任务…"
-                : "浏览器已保留，请检查运行记录"}
+                ? "正在创建浏览器与任务…"
+                : operationId
+                  ? "创建结果尚未确认"
+                  : "浏览器已保留，请检查运行记录"}
           </p>
-          {runQuery.data?.status === "completed" && (
+          {runData?.status === "completed" && (
             <p className="text-sm text-muted-foreground">
-              {run?.submit
-                ? "请在运行详情核对提交结果。"
-                : "自动填写任务已结束，尚未要求提交。请打开浏览器检查答案。"}
+              {run?.submit === null
+                ? "任务已结束。请在运行详情核对填写和提交结果。"
+                : run?.submit
+                  ? "请在运行详情核对提交结果。"
+                  : "自动填写任务已结束，尚未要求提交。请打开浏览器检查答案。"}
             </p>
           )}
-          {runQuery.data?.failure_reason && (
+          {runData?.failure_reason && (
             <p className="whitespace-pre-wrap text-sm">
-              {runQuery.data.failure_reason}
+              {runData.failure_reason}
             </p>
           )}
-          {runQuery.isError && (
+          {queryFailed && (
             <p role="alert" className="text-sm text-destructive">
               暂时无法获取进度，任务可能仍在运行，请查看运行详情。
             </p>
           )}
           <div className="flex flex-wrap gap-3">
-            {sessionId && (
+            {sessionId && !sessionClosed && (
               <Button asChild variant="outline">
                 <Link
                   to={`/browser-session/${sessionId}`}
@@ -295,21 +417,81 @@ function WenjuanxingPage() {
                 </Link>
               </Button>
             )}
-            {(finished || (mutation.isError && !run)) && (
+            {!run && operationId && !mutation.isPending && (
+              <div className="space-y-2 text-sm">
+                <p>正在确认原请求。结果未知时不会自动创建第二个任务。</p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => void operationQuery.refetch()}
+                >
+                  查询原请求
+                </Button>
+                {attempt.current?.id === operationId && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      if (!mutation.isPending && attempt.current)
+                        mutation.mutate(attempt.current);
+                    }}
+                  >
+                    重发同一请求
+                  </Button>
+                )}
+                <Link to="/runs" className="ml-3 underline">
+                  检查运行记录
+                </Link>
+              </div>
+            )}
+            {operation?.detail === "cancel_requested" && !finished && (
+              <p className="text-sm">已请求取消，等待执行器确认。</p>
+            )}
+            {operation?.detail === "close_requested" && !sessionClosed && (
+              <p className="text-sm">已请求关闭，等待浏览器状态确认。</p>
+            )}
+            {sessionClosed && (
+              <p className="text-sm">浏览器会话已关闭、过期或不可用。</p>
+            )}
+            {operation?.can_cancel && (
               <Button
-                variant="ghost"
-                onClick={() => {
-                  setRun(null);
-                  setSessionId(null);
-                  setError(null);
-                  mutation.reset();
-                }}
+                variant="outline"
+                disabled={actionMutation.isPending}
+                onClick={() => actionMutation.mutate("cancel")}
               >
-                填写另一份
+                取消任务
+              </Button>
+            )}
+            {operation?.can_close && !sessionClosed && (
+              <Button
+                variant="outline"
+                disabled={actionMutation.isPending}
+                onClick={() => actionMutation.mutate("close")}
+              >
+                关闭浏览器并释放资源
+              </Button>
+            )}
+            {actionMutation.isError && (
+              <p role="alert">操作结果尚未确认，请查询状态后再尝试。</p>
+            )}
+            {!operationId && !run && sessionId && !mutation.isPending && (
+              <p className="text-sm text-muted-foreground">
+                任务创建结果未知。请先检查运行记录，确认没有仍在执行的任务后再填写另一份。
+              </p>
+            )}
+            {(finished ||
+              (!operationId && !run && sessionId && !mutation.isPending)) && (
+              <Button variant="ghost" onClick={resetReferences}>
+                {operationId && !sessionClosed
+                  ? "保留浏览器，填写另一份"
+                  : "填写另一份"}
               </Button>
             )}
           </div>
         </section>
+      )}
+      {operationId && !invalidReference && operation && (
+        <ExecutionReport key={operationId} operationId={operationId} />
       )}
       <p className="text-xs leading-5 text-muted-foreground">
         填写资料会随任务发送给当前配置的模型，并保存在 FlowTrail
